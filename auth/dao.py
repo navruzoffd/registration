@@ -1,6 +1,6 @@
 from src.database import async_session_maker
 from sqlalchemy import select
-from src.models import Users
+from auth.models import Users
 
 class UsersDAO:
     @classmethod

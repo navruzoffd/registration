@@ -6,4 +6,6 @@ class Users(Base):
 
     id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String, nullable=False)
+    surname = Column(String, nullable=False)
+    nickname = Column(String, nullable=False)
     password = Column(String, nullable=False)

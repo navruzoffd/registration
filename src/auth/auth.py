@@ -1,16 +1,15 @@
 from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta
-from auth.dao import AuthDAO
+from src.dao.usersdao import UsersDAO
 from src.config import SECRET_KEY, ALGORITHM
-from fastapi.concurrency import run_in_threadpool
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
+async def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
@@ -24,12 +23,8 @@ def create_access_token(data: dict) -> str:
 
 
 async def authenticate_user(nickname: str, password: str):
-    user = await AuthDAO.find_one_or_none(nickname=nickname)
-    if not user:
-        return None
-    # Выполнение синхронной проверки пароля в исполнителе
-    password_matches = await run_in_threadpool(verify_password, password, user.password)
-    if not password_matches:
+    user = await UsersDAO.find_one_or_none(nickname=nickname)
+    if not user or not await verify_password(password, user.password):
         return None
     return user
     
